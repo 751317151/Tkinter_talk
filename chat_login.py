@@ -15,7 +15,7 @@ from multiprocessing import Process
 from PIL import ImageTk, Image
 
 
-def check_user_login(userName,passwd):
+def check_user_login(userName,passwd,login):
     uname = userName.get()
     password = passwd.get()
 
@@ -31,6 +31,7 @@ def check_user_login(userName,passwd):
     conn.close()
     
     if rows:
+        login.destroy()
         chat_client.talk()
     else:
         tk.messagebox.showinfo("error","用户不存在或密码错误！")
@@ -92,9 +93,9 @@ def check_user_regist(userRegistName,rpasswd,cpasswd,tphone,temail,regist):
     rows = cur.fetchall()
 
     if rows:
-        tk.messagebox.showinfo("error","用户名已存在！")
+        tk.messagebox.showerror("error","用户名已存在！")
     elif password != cpassword:
-        tk.messagebox.showinfo("error","两次密码不一致！")
+        tk.messagebox.showerror("error","两次密码不一致！")
     else:
         cur.execute("insert into users values(%s,md5(%s),%s,%s)",(uname,password,phone,email))
         conn.commit()
@@ -128,14 +129,14 @@ def user_login():
     passwd.configure(width=30)
     passwd.place(x=200,y=130)
 
-    blogin = tk.Button(login, text = "登 陆", command=lambda:check_user_login(userName,passwd))
+    blogin = tk.Button(login, text = "登 陆", command=lambda:check_user_login(userName,passwd,login))
     blogin.place(x=140,y=180)
-    bregist = tk.Button(login, text = "注 册", command=thread_regist)
+    bregist = tk.Button(login, text = "注 册", command=process_regist)
     bregist.place(x=220,y=180)
 
     login.mainloop()
 
-def thread_regist():
+def process_regist():
     Process(target=user_regist).start()
 
 if __name__ == '__main__':
